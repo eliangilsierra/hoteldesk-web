@@ -51,7 +51,7 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="px-3 py-4">
           <h2 className={`font-bold transition-all ${open ? 'text-lg' : 'text-xs text-center'}`}>
-            {open ? 'Hotel Admin' : 'HA'}
+            {open ? 'HotelDesk' : 'HD'}
           </h2>
         </div>
         

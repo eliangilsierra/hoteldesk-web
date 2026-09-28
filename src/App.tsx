@@ -8,12 +8,8 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Reservas from "./pages/Reservas";
-import Habitaciones from "./pages/Habitaciones";
-import Huespedes from "./pages/Huespedes";
-import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
+import { appRoutes } from "./routes";
 
 const queryClient = new QueryClient();
 
@@ -42,16 +38,9 @@ const App = () => (
                       <AppHeader />
                       <main className="flex-1 p-6">
                         <Routes>
-                          <Route path="/" element={<Dashboard />} />
-                          <Route path="/reservas" element={<Reservas />} />
-                          <Route path="/calendario" element={<Placeholder title="Calendario" description="Vista de calendario de reservas" />} />
-                          <Route path="/habitaciones" element={<Habitaciones />} />
-                          <Route path="/huespedes" element={<Huespedes />} />
-                          <Route path="/checkin" element={<Placeholder title="Check-in" description="Proceso de check-in" />} />
-                          <Route path="/checkout" element={<Placeholder title="Check-out" description="Proceso de check-out" />} />
-                          <Route path="/facturacion" element={<Placeholder title="Facturación" description="Gestión de facturas y pagos" />} />
-                          <Route path="/reportes" element={<Placeholder title="Reportes" description="Reportes y estadísticas" />} />
-                          <Route path="/ajustes" element={<Placeholder title="Ajustes" description="Configuración del sistema" />} />
+                          {appRoutes.map(({ path, element }) => (
+                            <Route key={path} path={path} element={element} />
+                          ))}
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </main>

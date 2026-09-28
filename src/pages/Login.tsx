@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,20 +11,30 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { toast } from 'sonner';
 import { Hotel } from 'lucide-react';
 
+const loginSchema = z.object({
+  email: z.string().email('Ingresa un correo electrónico válido'),
+  password: z.string().min(1, 'La contraseña es obligatoria'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
+
+  const onSubmit = async ({ email, password }: LoginFormValues) => {
     setIsLoading(true);
 
     try {
       const success = await login(email, password);
-      
+
       if (success) {
         toast.success('Inicio de sesión exitoso');
         navigate('/');
@@ -42,23 +55,24 @@ const Login = () => {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <Hotel className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">Hotel Admin</CardTitle>
+          <CardTitle className="text-2xl font-bold">HotelDesk</CardTitle>
           <CardDescription>
             Ingresa tus credenciales para acceder al sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <div className="space-y-2">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="admin@hotel.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                {...register('email')}
               />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>
@@ -66,16 +80,17 @@ const Login = () => {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                {...register('password')}
               />
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password.message}</p>
+              )}
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </Button>
           </form>
-          
+
           <div className="mt-6 space-y-2 text-xs text-muted-foreground">
             <p className="font-semibold">Usuarios de prueba:</p>
             <p>• admin@hotel.com (Administrador)</p>

@@ -1,73 +1,142 @@
-# Welcome to your Lovable project
+# HotelDesk
 
-## Project info
+Operations dashboard for hospitality teams — reservations, rooms, guests and billing in one place.
 
-**URL**: https://lovable.dev/projects/e5326993-d963-45d4-921a-4542e35e640d
+[![CI](https://github.com/eliangilsierra/hoteldesk-web/actions/workflows/ci.yml/badge.svg)](https://github.com/eliangilsierra/hoteldesk-web/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-339933)](#installation)
 
-## How can I edit this code?
+## Description
 
-There are several ways of editing your application.
+HotelDesk is a front-end operations dashboard built for small and mid-sized hotels. It centralizes the day-to-day work of a property's front desk and back office: tracking reservations, room availability, guest records, and (soon) billing and reporting — all in a single, responsive interface.
 
-**Use Lovable**
+This repository currently ships as a **self-contained demo**: all data (rooms, guests, reservations, users) is generated client-side with [Faker](https://fakerjs.dev/) and persisted to `localStorage`. There is no backend yet. The codebase is intentionally structured so that mock data can be swapped for real API calls without touching the UI layer — see [`docs/architecture.md`](docs/architecture.md) for how that boundary is drawn.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e5326993-d963-45d4-921a-4542e35e640d) and start prompting.
+### Problem statement
 
-Changes made via Lovable will be committed automatically to this repo.
+Independent and small-chain hotels are often stuck between two bad options: expensive, over-engineered property management systems (PMS), or a patchwork of spreadsheets and notebooks. HotelDesk aims to sit in between — a lightweight, modern, self-hostable operations layer that covers the essentials well before adding complexity.
 
-**Use your preferred IDE**
+### Target users
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Front-desk and reception staff managing daily check-ins/check-outs and reservations
+- Hotel administrators who need a real-time view of occupancy and revenue
+- Finance staff handling billing and payment tracking
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Key features
 
-Follow these steps:
+- **Dashboard** — real-time occupancy, revenue, and check-in/check-out metrics, with a 7-day occupancy chart
+- **Reservations** — searchable list with status tracking (pending, confirmed, checked-in, checked-out, cancelled, no-show)
+- **Rooms** — card-based inventory view with status, type, capacity, and amenities
+- **Guests** — guest directory with contact info, documents, and stay preferences
+- **Role-based access** — Administrator, Reception, and Finance roles with route protection
+- **Dark mode** — full light/dark theme support
+- Localized for the Colombian market by default (COP currency formatting, `America/Bogota` timezone) — see [`docs/decisions.md`](docs/decisions.md)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Roadmap
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+The following modules exist as placeholders in the navigation and are not yet implemented:
 
-# Step 3: Install the necessary dependencies.
-npm i
+- [ ] Calendar (timeline/Gantt view of reservations)
+- [ ] Guided check-in / check-out flows
+- [ ] Billing and invoice generation
+- [ ] Reports (ADR, RevPAR, CSV/XLSX export)
+- [ ] Settings (hotel configuration, taxes, policies)
+- [ ] Real API/backend integration to replace the mock data layer
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## Architecture overview
+
+HotelDesk is a client-only single-page application. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown and [`docs/decisions.md`](docs/decisions.md) for the reasoning behind key choices (why there's no backend yet, why Zustand over Redux, etc.).
+
+```
+src/
+├── components/
+│   ├── layout/       # Shell components (sidebar, header)
+│   └── ui/           # shadcn/ui primitives
+├── hooks/            # Shared React hooks
+├── lib/
+│   ├── types.ts      # Domain types
+│   ├── stores/       # Zustand state stores (auth, data)
+│   ├── utils/        # Currency and date formatting utilities
+│   └── mock/         # Faker-based mock data generation
+├── pages/            # Route-level components
+├── routes.tsx        # Route table
+└── App.tsx           # App shell, providers, routing
+```
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Build tool | Vite 5 |
+| Language | TypeScript 5 |
+| UI framework | React 18 |
+| Component library | shadcn/ui (Radix primitives) |
+| Styling | Tailwind CSS |
+| State management | Zustand |
+| Forms & validation | React Hook Form + Zod |
+| Data fetching (future) | TanStack Query |
+| Charts | Recharts |
+| Mock data | Faker.js |
+| Linting | ESLint (flat config) |
+
+## Installation
+
+Requires [Node.js](https://nodejs.org/) 18+ and npm.
+
+```bash
+git clone <repository-url>
+cd hoteldesk-web
+npm install
+```
+
+## Environment variables
+
+HotelDesk has no required environment variables today — it runs entirely client-side with mock data. See [`.env.example`](.env.example) for variables that will apply once a real backend is connected.
+
+## Running locally
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app starts at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Demo accounts
 
-**Use GitHub Codespaces**
+Any password is accepted for these demo users (mock authentication only — do not use this pattern in production):
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Role | Email |
+|---|---|
+| Administrator | `admin@hotel.com` |
+| Reception | `recepcion@hotel.com` |
+| Finance | `finanzas@hotel.com` |
 
-## What technologies are used for this project?
+## Available scripts
 
-This project is built with:
+| Script | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run build:dev` | Build in development mode |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Testing
 
-## How can I deploy this project?
+No automated test suite exists yet. This is tracked as a priority in the roadmap — contributions adding test coverage (Vitest + React Testing Library is the intended stack) are welcome.
 
-Simply open [Lovable](https://lovable.dev/projects/e5326993-d963-45d4-921a-4542e35e640d) and click on Share -> Publish.
+## Deployment
 
-## Can I connect a custom domain to my Lovable project?
+`npm run build` outputs a static bundle to `dist/`, deployable to any static host (Vercel, Netlify, Cloudflare Pages, S3 + CloudFront, etc.). No server runtime is required in the current mock-data version.
 
-Yes, you can!
+## Project structure
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+See [Architecture overview](#architecture-overview) above and [`docs/architecture.md`](docs/architecture.md) for details.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Contributing
+
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request.
+
+## License
+
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
